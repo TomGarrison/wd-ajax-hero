@@ -2,7 +2,6 @@
   'use strict';
 
   const movies = [];
-
   const renderMovies = function() {
     $('#listings').empty();
 
@@ -51,10 +50,32 @@
       $col.append($card, $modal);
 
       $('#listings').append($col);
-
       $('.modal-trigger').leanModal();
     }
   };
-
   // ADD YOUR CODE HERE
+  let form = document.getElementsByTagName('form')[0];
+  let search = $("#search");
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    let title = search.val();
+    $.ajax(`http://www.omdbapi.com/?s=${title}&type=movie&y=&plot=short&r=json`)
+      .then(function(data) {
+        return data.Search;
+      })
+      .then(function(search) {
+        for(let i = 0; i < search.length; i++) {
+          let newObj = {};
+            newObj.id = search[i].imdbID,
+            newObj.plot = search[i].Plot,
+            newObj.poster = search[i].Poster,
+            newObj.title = search[i].Title,
+            newObj.year = search[i].Year,
+            movies.push(newObj);
+            renderMovies();
+        }
+        movies.splice(0, movies.length);
+        form.reset();
+      });
+  })
 })();
